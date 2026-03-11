@@ -4,10 +4,15 @@ from pymongo import MongoClient
 from bson import ObjectId
 from bson.errors import InvalidId
 from dotenv import load_dotenv
-import bcrypt, os, jwt, razorpay, hmac, hashlib, random, string, smtplib, json
+import bcrypt, os, jwt, hmac, hashlib, random, string, smtplib, json
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 import google.generativeai as genai
+
+try:
+    import razorpay
+except ImportError:
+    razorpay = None
 
 load_dotenv()
 
@@ -45,7 +50,6 @@ This code expires in 10 minutes. If you didn't request this, ignore this email.
 
 – DocDrop Team"""
     if not SMTP_USER or not SMTP_PASS:
-        # Dev mode: print to console
         print(f"\n[DEV MODE] OTP for {to_email}: {otp}\n")
         return True
     try:
@@ -64,7 +68,7 @@ This code expires in 10 minutes. If you didn't request this, ignore this email.
 
 RZP_KEY_ID     = os.getenv("RAZORPAY_KEY_ID", "")
 RZP_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
-rzp_client     = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET)) if RZP_KEY_ID else None
+rzp_client     = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET)) if (RZP_KEY_ID and razorpay) else None
 
 CONSULTATION_FEE = 50000  # ₹500 in paise
 
@@ -129,7 +133,6 @@ def index():
 # ── Auth ──────────────────────────────────────
 @app.route("/api/auth/signup", methods=["POST"])
 def signup():
-    """Final signup — only called after OTP verified."""
     data  = request.json
     name  = data.get("name","").strip()
     email = data.get("email","").strip().lower()
@@ -143,7 +146,6 @@ def signup():
     if patients_col.find_one({"email":email}):
         return jsonify({"error":"Account already exists"}), 409
 
-    # Verify OTP
     entry = otp_store.get(email)
     if not entry:
         return jsonify({"error":"No OTP sent. Please request a code first."}), 400
@@ -153,7 +155,7 @@ def signup():
     if entry["otp"] != otp:
         return jsonify({"error":"Incorrect verification code."}), 400
 
-    otp_store.pop(email, None)  # consume OTP
+    otp_store.pop(email, None)
 
     hashed = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
     res    = patients_col.insert_one({"name":name or email.split("@")[0],"email":email,"password":hashed,"created_at":datetime.utcnow()})
@@ -164,7 +166,6 @@ def signup():
 
 @app.route("/api/auth/send-otp", methods=["POST"])
 def send_otp():
-    """Send OTP to email for signup verification."""
     data  = request.json
     email = data.get("email","").strip().lower()
     name  = data.get("name","").strip() or email.split("@")[0]
@@ -173,12 +174,6 @@ def send_otp():
         return jsonify({"error":"Email required"}), 400
     if patients_col.find_one({"email":email}):
         return jsonify({"error":"Account already exists with this email."}), 409
-
-    # Rate-limit: don't resend if valid OTP still exists and was sent <60s ago
-    existing = otp_store.get(email)
-    if existing and (existing["expires"] - timedelta(minutes=9)) > datetime.utcnow():
-        # OTP was sent less than 60s ago
-        pass  # allow resend anyway for UX
 
     otp = generate_otp()
     otp_store[email] = {
@@ -191,7 +186,6 @@ def send_otp():
     if not ok:
         return jsonify({"error":"Failed to send email. Check SMTP config."}), 500
 
-    # In dev mode (no SMTP), return OTP in response for easy testing
     dev_mode = not (SMTP_USER and SMTP_PASS)
     return jsonify({"ok":True, "dev_otp": otp if dev_mode else None})
 
@@ -201,7 +195,7 @@ def login_patient():
     email = data.get("email","").strip().lower()
     pw    = data.get("password","")
     p     = patients_col.find_one({"email":email})
-    if not p:                                    return jsonify({"error":"No account found"}), 404
+    if not p:                                         return jsonify({"error":"No account found"}), 404
     if not bcrypt.checkpw(pw.encode(), p["password"]): return jsonify({"error":"Wrong password"}), 401
     user = {"id":str(p["_id"]),"name":p["name"],"email":email,"role":"patient"}
     return jsonify({"ok":True,"token":make_token(user.copy()),"user":user})
@@ -212,14 +206,14 @@ def login_doctor():
     email = data.get("email","").strip().lower()
     pw    = data.get("password","")
     d     = doctors_col.find_one({"email":email})
-    if not d:                                    return jsonify({"error":"Doctor not found"}), 404
+    if not d:                                         return jsonify({"error":"Doctor not found"}), 404
     if not bcrypt.checkpw(pw.encode(), d["password"]): return jsonify({"error":"Wrong password"}), 401
     user = {"id":str(d["_id"]),"name":d["name"],"email":email,"role":"doctor"}
     return jsonify({"ok":True,"token":make_token(user.copy()),"user":user})
 
 @app.route("/api/auth/logout", methods=["POST"])
 def logout():
-    return jsonify({"ok":True})  # client deletes its own token
+    return jsonify({"ok":True})
 
 @app.route("/api/auth/me", methods=["GET"])
 def me():
@@ -384,7 +378,6 @@ def verify_razorpay_payment():
     if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature, doctor_id, date, time_slot]):
         return jsonify({"error": "Missing required fields"}), 400
 
-    # Verify Razorpay signature
     body     = f"{razorpay_order_id}|{razorpay_payment_id}"
     expected = hmac.new(RZP_KEY_SECRET.encode(), body.encode(), hashlib.sha256).hexdigest()
     if not hmac.compare_digest(expected, razorpay_signature):
@@ -429,7 +422,6 @@ def get_razorpay_key():
 # ── Video Call ────────────────────────────────
 @app.route("/api/call/room/<appt_id>", methods=["GET"])
 def get_call_room(appt_id):
-    """Return room info for a video call tied to an appointment."""
     err = require_auth()
     if err: return err
     user = get_current_user()
@@ -446,7 +438,6 @@ def get_call_room(appt_id):
     if appt.get("status") == "cancelled":
         return jsonify({"error": "Appointment is cancelled"}), 400
 
-    # Deterministic room + peer IDs from appointment id
     room_id       = f"docdrop-{appt_id}"
     peer_id       = f"{room_id}-{'doc' if user['role'] == 'doctor' else 'pat'}"
     other_peer_id = f"{room_id}-{'pat' if user['role'] == 'doctor' else 'doc'}"
@@ -477,7 +468,6 @@ def chat():
     if not messages:
         return jsonify({"error": "messages required"}), 400
 
-    # Fetch user's appointments to give context to the AI
     appt_context = []
     try:
         if user["role"] == "patient":
@@ -487,25 +477,22 @@ def chat():
 
         for a in appts:
             entry = {
-                "id":         str(a["_id"]),
-                "date":       a.get("date"),
-                "time_slot":  a.get("time_slot"),
-                "status":     a.get("status"),
-                "notes":      a.get("notes", ""),
+                "id":        str(a["_id"]),
+                "date":      a.get("date"),
+                "time_slot": a.get("time_slot"),
+                "status":    a.get("status"),
+                "notes":     a.get("notes", ""),
             }
-            # Enrich with doctor info
             try:
                 doc = doctors_col.find_one({"_id": ObjectId(a["doctor_id"])}, {"password": 0})
                 if doc:
-                    entry["doctor_name"]    = doc["name"]
+                    entry["doctor_name"]      = doc["name"]
                     entry["doctor_specialty"] = doc["specialty"]
             except Exception:
                 pass
-            # For doctors, include patient info
             if user["role"] == "doctor":
                 entry["patient_name"]  = a.get("patient_name")
                 entry["patient_email"] = a.get("patient_email")
-
             appt_context.append(entry)
     except Exception as e:
         print(f"[Chat] Could not load appointments: {e}")
@@ -557,16 +544,15 @@ Be professional, efficient, and clinically precise. Always maintain patient conf
             model_name="gemini-2.0-flash",
             system_instruction=system_prompt,
         )
-        # Convert messages to Gemini format
         gemini_history = []
         for msg in messages[:-1]:
             gemini_history.append({
-                "role": "user" if msg["role"] == "user" else "model",
+                "role":  "user" if msg["role"] == "user" else "model",
                 "parts": [msg["content"]],
             })
         chat_session = model.start_chat(history=gemini_history)
-        response = chat_session.send_message(messages[-1]["content"])
-        reply = response.text
+        response     = chat_session.send_message(messages[-1]["content"])
+        reply        = response.text
         return jsonify({"reply": reply})
     except Exception as e:
         print(f"[Chat] Gemini error: {e}")
