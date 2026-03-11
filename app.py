@@ -554,7 +554,7 @@ Be professional, efficient, and clinically precise. Always maintain patient conf
 
     try:
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name="gemini-2.0-flash",
             system_instruction=system_prompt,
         )
         # Convert messages to Gemini format
