@@ -7,3 +7,4 @@ PyJWT==2.8.0
 razorpay==1.4.1
 google-generativeai>=0.7.0
 gunicorn==21.2.0
+setuptools
