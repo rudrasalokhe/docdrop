@@ -66,9 +66,18 @@ This code expires in 10 minutes. If you didn't request this, ignore this email.
         print(f"[Email error] {e}")
         return False
 
-RZP_KEY_ID     = os.getenv("RAZORPAY_KEY_ID", "")
-RZP_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
-rzp_client     = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET)) if (RZP_KEY_ID and razorpay) else None
+RZP_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
+RZP_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
+
+# Debug check
+print("Razorpay Key ID:", RZP_KEY_ID)
+print("Razorpay Secret Loaded:", bool(RZP_KEY_SECRET))
+
+if RZP_KEY_ID and RZP_KEY_SECRET and razorpay:
+    rzp_client = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET))
+else:
+    rzp_client = None
+    print("⚠ Razorpay not configured properly")
 
 CONSULTATION_FEE = 50000  # ₹500 in paise
 
