@@ -4,15 +4,10 @@ from pymongo import MongoClient
 from bson import ObjectId
 from bson.errors import InvalidId
 from dotenv import load_dotenv
-import bcrypt, os, jwt, hmac, hashlib, random, string, smtplib, json
+import bcrypt, os, jwt, random, string, smtplib, json
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 import google.generativeai as genai
-
-try:
-    import razorpay
-except ImportError:
-    razorpay = None
 
 load_dotenv()
 
@@ -25,20 +20,20 @@ if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
 # ── Email / OTP config ────────────────────────
-SMTP_HOST     = os.getenv("SMTP_HOST", "smtp.gmail.com")
-SMTP_PORT     = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER     = os.getenv("SMTP_USER", "")
-SMTP_PASS     = os.getenv("SMTP_PASS", "")
-FROM_EMAIL    = os.getenv("FROM_EMAIL", SMTP_USER)
+SMTP_HOST  = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT  = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER  = os.getenv("SMTP_USER", "")
+SMTP_PASS  = os.getenv("SMTP_PASS", "")
+FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER)
 
-# In-memory OTP store: email -> {otp, expires, data}
+# In-memory OTP store: email -> {otp, expires, name}
 otp_store = {}
 
 def generate_otp():
     return "".join(random.choices(string.digits, k=6))
 
 def send_otp_email(to_email, otp, name):
-    """Send OTP via SMTP. Falls back to console log if SMTP not configured."""
+    """Send OTP via SMTP. Raises if SMTP is not configured."""
     subject = "DocDrop – Your verification code"
     body    = f"""Hi {name},
 
@@ -49,9 +44,6 @@ Your DocDrop signup verification code is:
 This code expires in 10 minutes. If you didn't request this, ignore this email.
 
 – DocDrop Team"""
-    if not SMTP_USER or not SMTP_PASS:
-        print(f"\n[DEV MODE] OTP for {to_email}: {otp}\n")
-        return True
     try:
         msg = MIMEText(body)
         msg["Subject"] = subject
@@ -65,21 +57,6 @@ This code expires in 10 minutes. If you didn't request this, ignore this email.
     except Exception as e:
         print(f"[Email error] {e}")
         return False
-
-RZP_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
-RZP_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
-
-# Debug check
-print("Razorpay Key ID:", RZP_KEY_ID)
-print("Razorpay Secret Loaded:", bool(RZP_KEY_SECRET))
-
-if RZP_KEY_ID and RZP_KEY_SECRET and razorpay:
-    rzp_client = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET))
-else:
-    rzp_client = None
-    print("⚠ Razorpay not configured properly")
-
-CONSULTATION_FEE = 50000  # ₹500 in paise
 
 client = MongoClient(os.getenv("MONGO_URI", "mongodb://localhost:27017"))
 db     = client[os.getenv("DB_NAME", "docdrop")]
@@ -184,6 +161,9 @@ def send_otp():
     if patients_col.find_one({"email":email}):
         return jsonify({"error":"Account already exists with this email."}), 409
 
+    if not SMTP_USER or not SMTP_PASS:
+        return jsonify({"error":"Email service not configured. Please contact support."}), 503
+
     otp = generate_otp()
     otp_store[email] = {
         "otp":     otp,
@@ -193,10 +173,11 @@ def send_otp():
 
     ok = send_otp_email(email, otp, name)
     if not ok:
-        return jsonify({"error":"Failed to send email. Check SMTP config."}), 500
+        otp_store.pop(email, None)
+        return jsonify({"error":"Failed to send verification email. Please try again."}), 500
 
-    dev_mode = not (SMTP_USER and SMTP_PASS)
-    return jsonify({"ok":True, "dev_otp": otp if dev_mode else None})
+    return jsonify({"ok": True})
+
 
 @app.route("/api/auth/login/patient", methods=["POST"])
 def login_patient():
@@ -204,7 +185,7 @@ def login_patient():
     email = data.get("email","").strip().lower()
     pw    = data.get("password","")
     p     = patients_col.find_one({"email":email})
-    if not p:                                         return jsonify({"error":"No account found"}), 404
+    if not p:                                           return jsonify({"error":"No account found"}), 404
     if not bcrypt.checkpw(pw.encode(), p["password"]): return jsonify({"error":"Wrong password"}), 401
     user = {"id":str(p["_id"]),"name":p["name"],"email":email,"role":"patient"}
     return jsonify({"ok":True,"token":make_token(user.copy()),"user":user})
@@ -215,7 +196,7 @@ def login_doctor():
     email = data.get("email","").strip().lower()
     pw    = data.get("password","")
     d     = doctors_col.find_one({"email":email})
-    if not d:                                         return jsonify({"error":"Doctor not found"}), 404
+    if not d:                                           return jsonify({"error":"Doctor not found"}), 404
     if not bcrypt.checkpw(pw.encode(), d["password"]): return jsonify({"error":"Wrong password"}), 401
     user = {"id":str(d["_id"]),"name":d["name"],"email":email,"role":"doctor"}
     return jsonify({"ok":True,"token":make_token(user.copy()),"user":user})
@@ -331,102 +312,6 @@ def taken_slots():
     if not did or not date: return jsonify({"error":"doctor_id and date required"}), 400
     taken = appointments_col.find({"doctor_id":did,"date":date,"status":{"$ne":"cancelled"}},{"time_slot":1})
     return jsonify([t["time_slot"] for t in taken])
-
-# ── Payments: Razorpay ────────────────────────
-@app.route("/api/payments/create-order", methods=["POST"])
-def create_razorpay_order():
-    err = require_auth("patient")
-    if err: return err
-    if not rzp_client:
-        return jsonify({"error": "Razorpay not configured — add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to .env"}), 503
-
-    data      = request.json
-    doctor_id = data.get("doctor_id")
-    date      = data.get("date")
-    time_slot = data.get("time_slot")
-
-    if not doctor_id or not date or not time_slot:
-        return jsonify({"error": "doctor_id, date and time_slot required"}), 400
-
-    if appointments_col.find_one({"doctor_id": doctor_id, "date": date, "time_slot": time_slot, "status": {"$ne": "cancelled"}}):
-        return jsonify({"error": "That slot is already booked"}), 409
-
-    try:
-        order = rzp_client.order.create({
-            "amount":          CONSULTATION_FEE,
-            "currency":        "INR",
-            "payment_capture": 1,
-            "notes":           {"doctor_id": doctor_id, "date": date, "time_slot": time_slot}
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-    return jsonify({
-        "order_id": order["id"],
-        "amount":   order["amount"],
-        "currency": order["currency"],
-        "key_id":   RZP_KEY_ID,
-    })
-
-
-@app.route("/api/payments/verify", methods=["POST"])
-def verify_razorpay_payment():
-    err = require_auth("patient")
-    if err: return err
-    user = get_current_user()
-
-    data                = request.json
-    razorpay_order_id   = data.get("razorpay_order_id")
-    razorpay_payment_id = data.get("razorpay_payment_id")
-    razorpay_signature  = data.get("razorpay_signature")
-    doctor_id           = data.get("doctor_id")
-    date                = data.get("date")
-    time_slot           = data.get("time_slot")
-    notes               = data.get("notes", "").strip()
-
-    if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature, doctor_id, date, time_slot]):
-        return jsonify({"error": "Missing required fields"}), 400
-
-    body     = f"{razorpay_order_id}|{razorpay_payment_id}"
-    expected = hmac.new(RZP_KEY_SECRET.encode(), body.encode(), hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(expected, razorpay_signature):
-        return jsonify({"error": "Payment verification failed — signature mismatch"}), 400
-
-    if appointments_col.find_one({"doctor_id": doctor_id, "date": date, "time_slot": time_slot, "status": {"$ne": "cancelled"}}):
-        return jsonify({"error": "Slot was just taken — please choose another"}), 409
-
-    try:
-        doctor = doctors_col.find_one({"_id": ObjectId(doctor_id)})
-    except:
-        return jsonify({"error": "Invalid doctor id"}), 400
-    if not doctor:
-        return jsonify({"error": "Doctor not found"}), 404
-
-    res  = appointments_col.insert_one({
-        "doctor_id":     doctor_id,
-        "patient_id":    user["id"],
-        "patient_name":  user["name"],
-        "patient_email": user["email"],
-        "date":          date,
-        "time_slot":     time_slot,
-        "notes":         notes,
-        "status":        "upcoming",
-        "payment_id":    razorpay_payment_id,
-        "order_id":      razorpay_order_id,
-        "amount_paid":   CONSULTATION_FEE,
-        "created_at":    datetime.utcnow(),
-    })
-    appt               = appointments_col.find_one({"_id": res.inserted_id})
-    appt["id"]         = str(appt.pop("_id"))
-    appt["doctorName"] = doctor["name"]
-    appt["specialty"]  = doctor["specialty"]
-    return jsonify(appt), 201
-
-
-@app.route("/api/payments/key", methods=["GET"])
-def get_razorpay_key():
-    return jsonify({"key_id": RZP_KEY_ID})
-
 
 # ── Video Call ────────────────────────────────
 @app.route("/api/call/room/<appt_id>", methods=["GET"])
