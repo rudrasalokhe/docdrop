@@ -60,7 +60,7 @@
     <div class="hero-visual">
       <div class="hcard-mini hcard-mini-2">
         <div class="hm-icon" style="background:#fdf2f1">&#128274;</div>
-        <div><div class="hm-title">Secure payment</div><div class="hm-sub">Razorpay &middot; &#8377;500</div></div>
+        <div><div class="hm-title">Free to book</div><div class="hm-sub">No payment required</div></div>
       </div>
       <div class="hcard">
         <div class="hcard-top">
@@ -148,8 +148,8 @@
         <div class="step-card">
           <span class="step-num">03</span>
           <div class="step-icon">&#9989;</div>
-          <div class="step-title">Pay &amp; confirm</div>
-          <div class="step-text">One flat fee of &#8377;500 &mdash; no surprises. Secure checkout via Razorpay. Instant confirmation.</div>
+          <div class="step-title">Confirm &amp; book</div>
+          <div class="step-text">Choose your slot and confirm instantly. No payment needed &mdash; booking is completely free.</div>
         </div>
       </div>
     </div>
@@ -159,18 +159,18 @@
     <div class="section-inner">
       <div class="section-eyebrow">Pricing</div>
       <h2 class="section-title">Simple, honest pricing.</h2>
-      <p class="section-sub">No subscriptions. No hidden fees. You pay only when you book.</p>
+      <p class="section-sub">No subscriptions. No hidden fees. Booking is completely free.</p>
       <div class="pricing-grid">
         <div class="pricing-card">
           <div class="pricing-plan">Consultation</div>
-          <div class="pricing-price">&#8377;500<span>/visit</span></div>
-          <div class="pricing-desc">A single doctor consultation, booked on demand.</div>
+          <div class="pricing-price">Free<span> to book</span></div>
+          <div class="pricing-desc">Book a doctor consultation instantly, on demand.</div>
           <ul class="pricing-features">
             <li>Any specialist on the platform</li>
             <li>Your choice of date &amp; time slot</li>
             <li>Instant booking confirmation</li>
             <li>Cancel anytime before appointment</li>
-            <li>Secure Razorpay checkout</li>
+            <li>No payment required</li>
           </ul>
           <button class="btn-cta green full-w" onclick="showApp('patient','signup')">Book now</button>
         </div>
@@ -284,7 +284,7 @@
               <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" oninput="otpNext(this,4)" onkeydown="otpBack(this,event,4)"/>
               <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" oninput="otpNext(this,5)" onkeydown="otpBack(this,event,5)"/>
             </div>
-            <div id="devOtpBanner" class="dev-banner hidden"></div>
+
             <div class="otp-timer-wrap">
               <span id="otpTimer" class="otp-timer"></span>
               <button type="button" id="resendBtn" class="link-btn hidden" onclick="resendOtp()">Resend code</button>
@@ -335,14 +335,14 @@
               <label>Notes <span class="optional-tag">optional</span></label>
               <textarea id="pNotes" rows="3" placeholder="Reason for visit..."></textarea>
             </div>
-            <button id="bookBtn" onclick="bookAppointment()" class="btn-cta book-btn">&#128179; Pay &#8377;500 &amp; Book</button>
+            <button id="bookBtn" onclick="bookAppointment()" class="btn-cta book-btn">&#128197; Book Appointment</button>
           </div>
         </div>
         <div class="box">
           <div class="box-header"><h3>My Appointments</h3></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Doctor</th><th>Specialty</th><th>Date</th><th>Time</th><th>Payment</th><th>Status</th><th>Call</th><th></th></tr></thead>
+              <thead><tr><th>Doctor</th><th>Specialty</th><th>Date</th><th>Time</th><th>Status</th><th>Call</th><th></th></tr></thead>
               <tbody id="patientTableBody"><tr><td colspan="8" style="color:var(--ink-3);text-align:center;padding:32px">Loading...</td></tr></tbody>
             </table>
           </div>
@@ -473,7 +473,7 @@
   </div>
 </div>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="/static/js/app.js"></script>
 </body>
