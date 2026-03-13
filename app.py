@@ -4,10 +4,8 @@ from pymongo import MongoClient
 from bson import ObjectId
 from bson.errors import InvalidId
 from dotenv import load_dotenv
-import bcrypt, os, jwt, random, string, smtplib, json
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.utils import formataddr
+import bcrypt, os, jwt, random, string, json
+import urllib.request
 from datetime import datetime, timedelta
 import google.generativeai as genai
 
@@ -22,23 +20,21 @@ if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
 # ── Email / OTP config ────────────────────────
-SMTP_HOST  = os.getenv("SMTP_HOST", "smtp.gmail.com")
-SMTP_PORT  = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER  = os.getenv("SMTP_USER", "")
-SMTP_PASS  = os.getenv("SMTP_PASS", "")
-FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER)
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
+SMTP_USER     = os.getenv("SMTP_USER", "")  # used as sender email
 
 def generate_otp():
     return "".join(random.choices(string.digits, k=6))
 
 def send_otp_email(to_email, otp, name):
-    """Send OTP via SMTP with Gmail app-password support."""
-    if not SMTP_USER or not SMTP_PASS:
+    """Send OTP via Brevo HTTP API (works on Render free tier)."""
+    if not BREVO_API_KEY:
         # Dev fallback — print OTP to server console
         print(f"\n{'='*40}\n[DEV] OTP for {to_email} → {otp}\n{'='*40}\n", flush=True)
         return True
 
-    subject = "Your DocDrop verification code"
+    sender_email = SMTP_USER if SMTP_USER else "noreply@docdrop.com"
+
     html_body = f"""<!DOCTYPE html>
 <html><body style="font-family:sans-serif;background:#f7f3ed;margin:0;padding:32px">
 <div style="max-width:480px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e4ddd2">
@@ -59,33 +55,30 @@ def send_otp_email(to_email, otp, name):
 </div>
 </body></html>"""
 
-    plain_body = f"Hi {name},\n\nYour DocDrop verification code is: {otp}\n\nExpires in 10 minutes.\n\n– DocDrop Team"
+    payload = json.dumps({
+        "sender":   {"name": "DocDrop", "email": sender_email},
+        "to":       [{"email": to_email, "name": name}],
+        "subject":  "Your DocDrop verification code",
+        "htmlContent": html_body,
+        "textContent": f"Hi {name},\n\nYour DocDrop verification code is: {otp}\n\nExpires in 10 minutes.\n\n– DocDrop Team"
+    }).encode("utf-8")
 
     try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"]    = formataddr(("DocDrop", SMTP_USER))
-        msg["To"]      = to_email
-        msg["Reply-To"] = SMTP_USER
-        msg.attach(MIMEText(plain_body, "plain", "utf-8"))
-        msg.attach(MIMEText(html_body,  "html",  "utf-8"))
-
-        with smtplib.SMTP(SMTP_HOST, int(SMTP_PORT)) as s:
-            s.ehlo()
-            s.starttls()
-            s.ehlo()
-            s.login(SMTP_USER, SMTP_PASS)
-            s.sendmail(SMTP_USER, [to_email], msg.as_string())
-        print(f"[Email] OTP sent to {to_email}", flush=True)
-        return True
-    except smtplib.SMTPAuthenticationError as e:
-        print(f"[Email] AUTH ERROR — wrong credentials or app password not set: {e}", flush=True)
-        return False
-    except smtplib.SMTPException as e:
-        print(f"[Email] SMTP ERROR: {e}", flush=True)
-        return False
+        req = urllib.request.Request(
+            "https://api.brevo.com/v3/smtp/email",
+            data=payload,
+            headers={
+                "accept":       "application/json",
+                "api-key":      BREVO_API_KEY,
+                "content-type": "application/json",
+            },
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            print(f"[Email] OTP sent to {to_email} via Brevo, status={resp.status}", flush=True)
+            return True
     except Exception as e:
-        print(f"[Email] UNEXPECTED ERROR: {type(e).__name__}: {e}", flush=True)
+        print(f"[Email] Brevo API ERROR: {type(e).__name__}: {e}", flush=True)
         return False
 
 client = MongoClient(os.getenv("MONGO_URI", "mongodb://localhost:27017"))
