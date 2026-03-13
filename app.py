@@ -28,9 +28,6 @@ SMTP_USER  = os.getenv("SMTP_USER", "")
 SMTP_PASS  = os.getenv("SMTP_PASS", "")
 FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER)
 
-# In-memory OTP store: email -> {otp, expires, name}
-otp_store = {}
-
 def generate_otp():
     return "".join(random.choices(string.digits, k=6))
 
@@ -165,16 +162,16 @@ def signup():
     if patients_col.find_one({"email":email}):
         return jsonify({"error":"Account already exists"}), 409
 
-    entry = otp_store.get(email)
+    entry = db["otps"].find_one({"email": email})
     if not entry:
         return jsonify({"error":"No OTP sent. Please request a code first."}), 400
     if datetime.utcnow() > entry["expires"]:
-        otp_store.pop(email, None)
+        db["otps"].delete_one({"email": email})
         return jsonify({"error":"OTP expired. Please request a new one."}), 400
     if entry["otp"] != otp:
         return jsonify({"error":"Incorrect verification code."}), 400
 
-    otp_store.pop(email, None)
+    db["otps"].delete_one({"email": email})
 
     hashed = bcrypt.hashpw(pw.encode(), bcrypt.gensalt())
     res    = patients_col.insert_one({"name":name or email.split("@")[0],"email":email,"password":hashed,"created_at":datetime.utcnow()})
@@ -195,15 +192,15 @@ def send_otp():
         return jsonify({"error":"Account already exists with this email."}), 409
 
     otp = generate_otp()
-    otp_store[email] = {
-        "otp":     otp,
-        "expires": datetime.utcnow() + timedelta(minutes=10),
-        "name":    name,
-    }
+    db["otps"].replace_one(
+        {"email": email},
+        {"email": email, "otp": otp, "expires": datetime.utcnow() + timedelta(minutes=10), "name": name},
+        upsert=True
+    )
 
     ok = send_otp_email(email, otp, name)
     if not ok:
-        otp_store.pop(email, None)
+        db["otps"].delete_one({"email": email})
         return jsonify({"error": "Could not send verification email. Check that SMTP_USER, SMTP_PASS, and SMTP_HOST are set correctly in your environment."}), 500
 
     return jsonify({"ok": True})
