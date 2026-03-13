@@ -26,16 +26,25 @@ SMTP_HOST  = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT  = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER  = os.getenv("SMTP_USER", "")
 SMTP_PASS  = os.getenv("SMTP_PASS", "")
-FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER)
+FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER)  # FIX: default to SMTP_USER if not set
 
 def generate_otp():
     return "".join(random.choices(string.digits, k=6))
 
 def send_otp_email(to_email, otp, name):
-    """Send OTP via SMTP with Gmail app-password support."""
+    """Send OTP via SMTP.
+
+    Gmail setup:
+      SMTP_USER = your Gmail address (e.g. you@gmail.com)
+      SMTP_PASS = 16-char App Password  (NOT your normal Gmail password)
+                  Generate at: https://myaccount.google.com/apppasswords
+                  Requires 2-Step Verification to be turned on first.
+      SMTP_HOST = smtp.gmail.com  (default)
+      SMTP_PORT = 587             (default)
+    """
     if not SMTP_USER or not SMTP_PASS:
         # Dev fallback — print OTP to server console
-        print(f"\n{'='*40}\n[DEV] OTP for {to_email} → {otp}\n{'='*40}\n", flush=True)
+        print(f"\n{'='*40}\n[DEV] OTP for {to_email} -> {otp}\n{'='*40}\n", flush=True)
         return True
 
     subject = "Your DocDrop verification code"
@@ -54,32 +63,45 @@ def send_otp_email(to_email, otp, name):
     <p style="color:#9c9389;font-size:12px;margin:0">This code expires in <strong>10 minutes</strong>. If you did not request this, please ignore this email.</p>
   </div>
   <div style="background:#f7f3ed;padding:16px 32px;border-top:1px solid #e4ddd2">
-    <p style="color:#9c9389;font-size:11px;font-family:monospace;margin:0">© 2024 DocDrop · Mumbai</p>
+    <p style="color:#9c9389;font-size:11px;font-family:monospace;margin:0">&copy; 2024 DocDrop &middot; Mumbai</p>
   </div>
 </div>
 </body></html>"""
 
-    plain_body = f"Hi {name},\n\nYour DocDrop verification code is: {otp}\n\nExpires in 10 minutes.\n\n– DocDrop Team"
+    plain_body = f"Hi {name},\n\nYour DocDrop verification code is: {otp}\n\nExpires in 10 minutes.\n\n- DocDrop Team"
 
     try:
         msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"]    = formataddr(("DocDrop", SMTP_USER))
-        msg["To"]      = to_email
-        msg["Reply-To"] = SMTP_USER
+        msg["Subject"]  = subject
+        # FIX: use FROM_EMAIL (resolves to SMTP_USER when not separately set)
+        msg["From"]     = formataddr(("DocDrop", FROM_EMAIL))
+        msg["To"]       = to_email
+        msg["Reply-To"] = FROM_EMAIL
         msg.attach(MIMEText(plain_body, "plain", "utf-8"))
         msg.attach(MIMEText(html_body,  "html",  "utf-8"))
 
-        with smtplib.SMTP(SMTP_HOST, int(SMTP_PORT)) as s:
+        # FIX: SMTP_PORT already an int — removed redundant int() cast
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as s:
             s.ehlo()
             s.starttls()
             s.ehlo()
             s.login(SMTP_USER, SMTP_PASS)
+            # FIX: envelope sender must be SMTP_USER (the authenticated account)
             s.sendmail(SMTP_USER, [to_email], msg.as_string())
         print(f"[Email] OTP sent to {to_email}", flush=True)
         return True
+
     except smtplib.SMTPAuthenticationError as e:
-        print(f"[Email] AUTH ERROR — wrong credentials or app password not set: {e}", flush=True)
+        print(
+            f"[Email] AUTH ERROR\n"
+            f"  -> For Gmail use a 16-char App Password, not your normal password.\n"
+            f"  -> Generate one at https://myaccount.google.com/apppasswords\n"
+            f"  -> Detail: {e}",
+            flush=True,
+        )
+        return False
+    except smtplib.SMTPRecipientsRefused as e:
+        print(f"[Email] RECIPIENT REFUSED: {e}", flush=True)
         return False
     except smtplib.SMTPException as e:
         print(f"[Email] SMTP ERROR: {e}", flush=True)
@@ -101,7 +123,7 @@ DOCTORS_SEED = [
     {"name":"Dr. Marcus Webb", "specialty":"Cardiology",  "email":"marcus@docdrop.com", "initials":"MW","color":"#ff4ecd","colorBg":"rgba(255,78,205,0.12)"},
     {"name":"Dr. Priya Nair",  "specialty":"Dermatology", "email":"priya@docdrop.com",  "initials":"PN","color":"#4f8bff","colorBg":"rgba(79,139,255,0.12)"},
     {"name":"Dr. James Okon",  "specialty":"Neurology",   "email":"james@docdrop.com",  "initials":"JO","color":"#ff7a35","colorBg":"rgba(255,122,53,0.12)"},
-    {"name":"Dr. Lena Müller", "specialty":"Pediatrics",  "email":"lena@docdrop.com",   "initials":"LM","color":"#2dd4bf","colorBg":"rgba(45,212,191,0.12)"},
+    {"name":"Dr. Lena Muller", "specialty":"Pediatrics",  "email":"lena@docdrop.com",   "initials":"LM","color":"#2dd4bf","colorBg":"rgba(45,212,191,0.12)"},
     {"name":"Dr. Ravi Patel",  "specialty":"Orthopedics", "email":"ravi@docdrop.com",   "initials":"RP","color":"#a78bfa","colorBg":"rgba(167,139,250,0.12)"},
 ]
 
@@ -201,7 +223,7 @@ def send_otp():
     ok = send_otp_email(email, otp, name)
     if not ok:
         db["otps"].delete_one({"email": email})
-        return jsonify({"error": "Could not send verification email. Check that SMTP_USER, SMTP_PASS, and SMTP_HOST are set correctly in your environment."}), 500
+        return jsonify({"error": "Could not send verification email. For Gmail: set SMTP_USER=you@gmail.com and SMTP_PASS to a 16-char App Password (not your login password). Generate one at https://myaccount.google.com/apppasswords"}), 500
 
     return jsonify({"ok": True})
 
@@ -382,7 +404,7 @@ def chat():
     user = get_current_user()
 
     if not GEMINI_API_KEY:
-        return jsonify({"error": "Chatbot not configured — add GEMINI_API_KEY to .env"}), 503
+        return jsonify({"error": "Chatbot not configured - add GEMINI_API_KEY to .env"}), 503
 
     data     = request.json
     messages = data.get("messages", [])
@@ -435,30 +457,20 @@ You can help the patient with:
 - General health and wellness guidance (always remind them to consult their doctor for medical decisions)
 - Rescheduling or cancellation reminders (guide them to use the dashboard)
 - Answering questions about their doctors' specialties
-- Providing general information about medical specialties
 
 Always be warm, empathetic, and professional. Keep responses concise and clear.
-Never diagnose conditions or prescribe medications. Always recommend professional medical advice for health concerns.
-If asked about something outside your scope, politely redirect to their assigned doctor."""
+Never diagnose conditions or prescribe medications."""
 
     else:
         system_prompt = f"""You are a clinical assistant for DocDrop, a telemedicine platform.
 You are chatting with Dr. {user['name']} (email: {user['email']}).
 Today's date is {today_str}.
 
-Here are the upcoming/active appointments you need to manage (JSON):
+Here are the upcoming/active appointments (JSON):
 {json.dumps(appt_context, indent=2)}
 
-You can help the doctor with:
-- Reviewing their appointment schedule (upcoming, today, past)
-- Summarising patient notes for each appointment
-- Identifying appointment conflicts or gaps
-- Suggesting preparation tips for specific specialties
-- Drafting follow-up reminders or notes
-- Providing a daily/weekly schedule overview
-- Answering questions about their patient list
-
-Be professional, efficient, and clinically precise. Always maintain patient confidentiality mindset."""
+Help the doctor with schedule review, patient notes, appointment conflicts, and daily overview.
+Be professional, efficient, and clinically precise."""
 
     try:
         model = genai.GenerativeModel(
