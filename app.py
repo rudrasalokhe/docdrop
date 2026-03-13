@@ -6,6 +6,8 @@ from bson.errors import InvalidId
 from dotenv import load_dotenv
 import bcrypt, os, jwt, random, string, smtplib, json
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.utils import formataddr
 from datetime import datetime, timedelta
 import google.generativeai as genai
 
@@ -33,33 +35,60 @@ def generate_otp():
     return "".join(random.choices(string.digits, k=6))
 
 def send_otp_email(to_email, otp, name):
-    """Send OTP via SMTP. In dev (no SMTP config), logs to console and returns True."""
-    subject = "DocDrop – Your verification code"
-    body    = f"""Hi {name},
-
-Your DocDrop signup verification code is:
-
-    {otp}
-
-This code expires in 10 minutes. If you didn't request this, ignore this email.
-
-– DocDrop Team"""
+    """Send OTP via SMTP with Gmail app-password support."""
     if not SMTP_USER or not SMTP_PASS:
-        # Dev mode: print to console so the developer can see the OTP
-        print(f"\n[DEV] OTP for {to_email}: {otp}\n", flush=True)
+        # Dev fallback — print OTP to server console
+        print(f"\n{'='*40}\n[DEV] OTP for {to_email} → {otp}\n{'='*40}\n", flush=True)
         return True
+
+    subject = "Your DocDrop verification code"
+    html_body = f"""<!DOCTYPE html>
+<html><body style="font-family:sans-serif;background:#f7f3ed;margin:0;padding:32px">
+<div style="max-width:480px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e4ddd2">
+  <div style="background:#1c1612;padding:24px 32px">
+    <span style="font-family:Georgia,serif;font-size:22px;font-style:italic;color:#f7f3ed">Doc<span style="color:#e05a3a;font-style:normal">Drop</span></span>
+  </div>
+  <div style="padding:32px">
+    <p style="color:#3a342d;font-size:16px;margin:0 0 8px">Hi {name},</p>
+    <p style="color:#6b6158;font-size:14px;margin:0 0 28px">Here is your verification code to create your DocDrop account:</p>
+    <div style="background:#fdf1ed;border:1.5px dashed rgba(224,90,58,.4);border-radius:12px;padding:24px;text-align:center;margin-bottom:24px">
+      <span style="font-family:monospace;font-size:38px;font-weight:700;letter-spacing:10px;color:#1c1612">{otp}</span>
+    </div>
+    <p style="color:#9c9389;font-size:12px;margin:0">This code expires in <strong>10 minutes</strong>. If you did not request this, please ignore this email.</p>
+  </div>
+  <div style="background:#f7f3ed;padding:16px 32px;border-top:1px solid #e4ddd2">
+    <p style="color:#9c9389;font-size:11px;font-family:monospace;margin:0">© 2024 DocDrop · Mumbai</p>
+  </div>
+</div>
+</body></html>"""
+
+    plain_body = f"Hi {name},\n\nYour DocDrop verification code is: {otp}\n\nExpires in 10 minutes.\n\n– DocDrop Team"
+
     try:
-        msg = MIMEText(body)
+        msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
-        msg["From"]    = FROM_EMAIL
+        msg["From"]    = formataddr(("DocDrop", SMTP_USER))
         msg["To"]      = to_email
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as s:
+        msg["Reply-To"] = SMTP_USER
+        msg.attach(MIMEText(plain_body, "plain", "utf-8"))
+        msg.attach(MIMEText(html_body,  "html",  "utf-8"))
+
+        with smtplib.SMTP(SMTP_HOST, int(SMTP_PORT)) as s:
+            s.ehlo()
             s.starttls()
+            s.ehlo()
             s.login(SMTP_USER, SMTP_PASS)
-            s.sendmail(FROM_EMAIL, [to_email], msg.as_string())
+            s.sendmail(SMTP_USER, [to_email], msg.as_string())
+        print(f"[Email] OTP sent to {to_email}", flush=True)
         return True
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"[Email] AUTH ERROR — wrong credentials or app password not set: {e}", flush=True)
+        return False
+    except smtplib.SMTPException as e:
+        print(f"[Email] SMTP ERROR: {e}", flush=True)
+        return False
     except Exception as e:
-        print(f"[Email error] {e}")
+        print(f"[Email] UNEXPECTED ERROR: {type(e).__name__}: {e}", flush=True)
         return False
 
 client = MongoClient(os.getenv("MONGO_URI", "mongodb://localhost:27017"))
@@ -175,7 +204,7 @@ def send_otp():
     ok = send_otp_email(email, otp, name)
     if not ok:
         otp_store.pop(email, None)
-        return jsonify({"error":"Failed to send verification email. Check SMTP settings."}), 500
+        return jsonify({"error": "Could not send verification email. Check that SMTP_USER, SMTP_PASS, and SMTP_HOST are set correctly in your environment."}), 500
 
     return jsonify({"ok": True})
 
