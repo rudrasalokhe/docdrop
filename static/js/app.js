@@ -139,13 +139,16 @@ async function initiateSignup() {
   const name = val("aName"), email = val("aEmail"), pass = val("aPass");
   if (!email || !pass) return toast("Email and password required", "error");
   if (pass.length < 4)  return toast("Password must be at least 4 characters", "error");
+  if (!email.includes("@")) return toast("Enter a valid email address", "error");
 
   const btn = document.querySelector("#authBtns .btn-cta");
+  if (!btn) return;
+  const origText = btn.textContent;
   btn.textContent = "Sending code...";
   btn.disabled    = true;
 
   try {
-    const res = await post("/api/auth/send-otp", { email, name });
+    await post("/api/auth/send-otp", { email, name });
     _signupData = { name, email, password: pass };
 
     hide("authStep1");
@@ -158,9 +161,9 @@ async function initiateSignup() {
     document.querySelectorAll(".otp-digit")[0].focus();
 
   } catch(e) {
-    toast(e.message, "error");
+    toast(e.message || "Failed to send verification code.", "error");
   } finally {
-    btn.textContent = "Sign Up →";
+    btn.textContent = origText;
     btn.disabled    = false;
   }
 }
@@ -300,61 +303,36 @@ async function bookAppointment() {
   if (!timeSlot) return toast("Please choose a time slot", "error");
 
   const btn = document.getElementById("bookBtn");
-  btn.innerHTML = "⏳ Creating order...";
+  btn.innerHTML = "⏳ Booking...";
   btn.disabled  = true;
 
   try {
-    const order  = await post("/api/payments/create-order", { doctor_id: doctorId, date, time_slot: timeSlot });
-    const doctor = allDoctors.find(d => d.id === doctorId);
-    const options = {
-      key: order.key_id, amount: order.amount, currency: order.currency,
-      name: "DocDrop",
-      description: `Consultation with ${doctor ? doctor.name : "Doctor"} on ${date} at ${timeSlot}`,
-      order_id: order.order_id,
-      prefill: { name: currentUser.name, email: currentUser.email },
-      theme: { color: "#f59e0b" },
-      handler: async function(response) {
-        btn.innerHTML = "⏳ Verifying...";
-        try {
-          await post("/api/payments/verify", {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            doctor_id: doctorId, date, time_slot: timeSlot, notes,
-          });
-          toast("Payment successful! Appointment booked ✓", "success");
-          document.getElementById("doctorSelect").value = "";
-          document.getElementById("pDate").value        = "";
-          document.getElementById("slotSelect").value   = "";
-          document.getElementById("pNotes").value       = "";
-          await loadPatientAppts();
-        } catch(e) { toast("Payment done but booking failed: " + e.message, "error"); }
-        finally { btn.innerHTML = "💳 Pay ₹500 & Book"; btn.disabled = false; }
-      },
-      modal: { ondismiss: function() { toast("Payment cancelled", "error"); btn.innerHTML = "💳 Pay ₹500 & Book"; btn.disabled = false; } }
-    };
-    new Razorpay(options).open();
+    await post("/api/appointments/book", { doctor_id: doctorId, date, time_slot: timeSlot, notes });
+    toast("Appointment booked successfully ✓", "success");
+    document.getElementById("doctorSelect").value = "";
+    document.getElementById("pDate").value        = "";
+    document.getElementById("slotSelect").value   = "";
+    document.getElementById("pNotes").value       = "";
+    await loadPatientAppts();
   } catch(e) {
     toast(e.message, "error");
-    btn.innerHTML = "💳 Pay ₹500 & Book";
+  } finally {
+    btn.innerHTML = "📅 Book Appointment";
     btn.disabled  = false;
   }
 }
 
 async function loadPatientAppts() {
   const tbody = document.getElementById("patientTableBody");
-  tbody.innerHTML = `<tr><td colspan="9" style="color:var(--text-2)">Loading...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="8" style="color:var(--text-2)">Loading...</td></tr>`;
   try {
     const appts = await get("/api/appointments/patient");
     if (!appts.length) {
-      tbody.innerHTML = `<tr><td colspan="9" style="color:var(--text-2);text-align:center;padding:28px">No appointments yet. Book your first one!</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="color:var(--text-2);text-align:center;padding:28px">No appointments yet. Book your first one!</td></tr>`;
       return;
     }
     tbody.innerHTML = "";
     appts.forEach(a => {
-      const payBadge = a.payment_id
-        ? `<span class="chip chip-paid" title="${a.payment_id}">✓ Paid</span>`
-        : `<span class="chip chip-free">Free</span>`;
       const tr = document.createElement("tr");
       const callBtn = a.status === "upcoming"
         ? `<button class="tbl-btn tbl-blue" onclick="joinCall('${a.id}')">&#128247; Join Call</button>`
@@ -364,7 +342,6 @@ async function loadPatientAppts() {
         <td>${a.specialty||"—"}</td>
         <td>${fmtDate(a.date)}</td>
         <td>${a.time_slot}</td>
-        <td>${payBadge}</td>
         <td><span class="chip chip-${a.status}">${a.status}</span></td>
         <td>${callBtn}</td>
         <td>${a.status==="upcoming"
@@ -373,7 +350,7 @@ async function loadPatientAppts() {
       tbody.appendChild(tr);
     });
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="9" style="color:var(--red)">Failed to load appointments.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="color:var(--red)">Failed to load appointments.</td></tr>`;
   }
 }
 
