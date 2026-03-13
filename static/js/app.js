@@ -139,13 +139,16 @@ async function initiateSignup() {
   const name = val("aName"), email = val("aEmail"), pass = val("aPass");
   if (!email || !pass) return toast("Email and password required", "error");
   if (pass.length < 4)  return toast("Password must be at least 4 characters", "error");
+  if (!email.includes("@")) return toast("Enter a valid email address", "error");
 
   const btn = document.querySelector("#authBtns .btn-cta");
+  if (!btn) return;
+  const origText = btn.textContent;
   btn.textContent = "Sending code...";
   btn.disabled    = true;
 
   try {
-    const res = await post("/api/auth/send-otp", { email, name });
+    await post("/api/auth/send-otp", { email, name });
     _signupData = { name, email, password: pass };
 
     hide("authStep1");
@@ -158,9 +161,9 @@ async function initiateSignup() {
     document.querySelectorAll(".otp-digit")[0].focus();
 
   } catch(e) {
-    toast(e.message, "error");
+    toast(e.message || "Failed to send verification code.", "error");
   } finally {
-    btn.textContent = "Sign Up →";
+    btn.textContent = origText;
     btn.disabled    = false;
   }
 }
