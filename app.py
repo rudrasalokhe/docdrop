@@ -33,7 +33,7 @@ def generate_otp():
     return "".join(random.choices(string.digits, k=6))
 
 def send_otp_email(to_email, otp, name):
-    """Send OTP via SMTP. Raises if SMTP is not configured."""
+    """Send OTP via SMTP. In dev (no SMTP config), logs to console and returns True."""
     subject = "DocDrop – Your verification code"
     body    = f"""Hi {name},
 
@@ -44,6 +44,10 @@ Your DocDrop signup verification code is:
 This code expires in 10 minutes. If you didn't request this, ignore this email.
 
 – DocDrop Team"""
+    if not SMTP_USER or not SMTP_PASS:
+        # Dev mode: print to console so the developer can see the OTP
+        print(f"\n[DEV] OTP for {to_email}: {otp}\n", flush=True)
+        return True
     try:
         msg = MIMEText(body)
         msg["Subject"] = subject
@@ -161,9 +165,6 @@ def send_otp():
     if patients_col.find_one({"email":email}):
         return jsonify({"error":"Account already exists with this email."}), 409
 
-    if not SMTP_USER or not SMTP_PASS:
-        return jsonify({"error":"Email service not configured. Please contact support."}), 503
-
     otp = generate_otp()
     otp_store[email] = {
         "otp":     otp,
@@ -174,7 +175,7 @@ def send_otp():
     ok = send_otp_email(email, otp, name)
     if not ok:
         otp_store.pop(email, None)
-        return jsonify({"error":"Failed to send verification email. Please try again."}), 500
+        return jsonify({"error":"Failed to send verification email. Check SMTP settings."}), 500
 
     return jsonify({"ok": True})
 
