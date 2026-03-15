@@ -6,14 +6,14 @@
   <title>DocDrop — Book Doctors Instantly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/styles.css"/>
 </head>
 <body>
 
-<!-- ══════════════════════════ LANDING ══════════════════════════ -->
 <div id="landingPage">
 
+  <!-- NAV -->
   <nav id="mainNav">
     <div class="nav-inner">
       <a href="#" class="nav-logo" onclick="scrollToTop()">Doc<em>Drop</em></a>
@@ -34,7 +34,7 @@
       <a href="#how" onclick="toggleMobileNav()">How it works</a>
       <a href="#pricing" onclick="toggleMobileNav()">Pricing</a>
       <a href="#about" onclick="toggleMobileNav()">About</a>
-      <button class="btn-cta" onclick="showApp('patient','signup')" style="border-radius:10px;margin-top:8px">Get started →</button>
+      <button class="btn-cta" onclick="showApp('patient','signup')" style="border-radius:8px;margin-top:8px">Get started →</button>
     </div>
   </nav>
 
@@ -42,28 +42,32 @@
   <section class="hero">
     <div class="hero-content">
       <div class="hero-eyebrow">
-        <span class="eyebrow-dot"></span> Live in Mumbai &amp; Pune
+        <span class="eyebrow-dot"></span>
+        Now serving Mumbai &amp; Pune
       </div>
       <h1>See a doctor<br><em>today,</em><br>not next week.</h1>
-      <p class="hero-sub">DocDrop connects you with verified specialists in under 60 seconds. No hold music. No callbacks. Just care, on your terms.</p>
+      <p class="hero-sub">
+        DocDrop connects you with verified specialists in under 60 seconds.
+        No hold music. No callbacks. Just care.
+      </p>
       <div class="hero-actions">
         <button class="btn-cta btn-lg" onclick="showApp('patient','signup')">Book an appointment →</button>
         <button class="btn-outline btn-lg" onclick="showApp('doctor','login')">I'm a doctor</button>
       </div>
       <div class="hero-proof">
         <div class="proof-avatars">
-          <div class="proof-av" style="background:#1e4d35">SC</div>
-          <div class="proof-av" style="background:#1a3460">MW</div>
-          <div class="proof-av" style="background:#5c1a28">PN</div>
-          <div class="proof-av" style="background:#3d2060">JO</div>
+          <div class="proof-av" style="background:#2d6a4f">SC</div>
+          <div class="proof-av" style="background:#1e3a8a">MW</div>
+          <div class="proof-av" style="background:#7f1d1d">PN</div>
+          <div class="proof-av" style="background:#4c1d95">JO</div>
         </div>
-        <span class="proof-text"><strong>500+ patients</strong> already using DocDrop</span>
+        <span class="proof-text"><strong>500+ patients</strong> booked with DocDrop</span>
       </div>
     </div>
 
     <div class="hero-visual">
       <div class="hcard-mini hcard-mini-2">
-        <div class="hm-icon" style="background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.2)">✓</div>
+        <div class="hm-icon">✓</div>
         <div>
           <div class="hm-title">Free to book</div>
           <div class="hm-sub">No payment required</div>
@@ -71,7 +75,7 @@
       </div>
       <div class="hcard">
         <div class="hcard-top">
-          <div class="hcard-av" style="background:rgba(16,185,129,.1);color:#10b981">SC</div>
+          <div class="hcard-av" style="background:#f0fdf4;color:#16a34a">SC</div>
           <div>
             <div class="hcard-name">Dr. Sarah Chen</div>
             <div class="hcard-spec">General Physician</div>
@@ -90,7 +94,7 @@
         <button class="hcard-btn" onclick="showApp('patient','signup')">Book appointment →</button>
       </div>
       <div class="hcard-mini hcard-mini-1">
-        <div class="hm-icon" style="background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.2)">📅</div>
+        <div class="hm-icon">📅</div>
         <div>
           <div class="hm-title">Confirmed!</div>
           <div class="hm-sub">Dr. Webb · Thu 2:30 PM</div>
@@ -122,42 +126,42 @@
       </div>
       <div class="doctors-grid">
         <div class="doc-card">
-          <div class="doc-av" style="background:rgba(16,185,129,.1);color:#10b981">SC</div>
+          <div class="doc-av" style="background:#f0fdf4;color:#16a34a">SC</div>
           <div class="doc-name">Dr. Sarah Chen</div>
           <div class="doc-spec">General Physician</div>
           <div class="doc-bio">MBBS, MD · 8 years. Specialises in preventive care and chronic disease management.</div>
           <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
         </div>
         <div class="doc-card">
-          <div class="doc-av" style="background:rgba(56,189,248,.1);color:#38bdf8">MW</div>
+          <div class="doc-av" style="background:#eff6ff;color:#1d4ed8">MW</div>
           <div class="doc-name">Dr. Marcus Webb</div>
           <div class="doc-spec">Cardiology</div>
           <div class="doc-bio">MBBS, DM Cardiology · 12 years. Heart health, ECGs, and cardiac risk assessment.</div>
           <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
         </div>
         <div class="doc-card">
-          <div class="doc-av" style="background:rgba(244,63,94,.1);color:#f43f5e">PN</div>
+          <div class="doc-av" style="background:#fef2f2;color:#dc2626">PN</div>
           <div class="doc-name">Dr. Priya Nair</div>
           <div class="doc-spec">Dermatology</div>
           <div class="doc-bio">MBBS, DVD · 6 years. Skin, hair and nail conditions — cosmetic and medical.</div>
           <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
         </div>
         <div class="doc-card">
-          <div class="doc-av" style="background:rgba(245,158,11,.1);color:#f59e0b">JO</div>
+          <div class="doc-av" style="background:#fffbeb;color:#d97706">JO</div>
           <div class="doc-name">Dr. James Okon</div>
           <div class="doc-spec">Neurology</div>
           <div class="doc-bio">MBBS, DM Neurology · 10 years. Headaches, seizures, neuropathy, and brain health.</div>
           <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
         </div>
         <div class="doc-card">
-          <div class="doc-av" style="background:rgba(16,185,129,.1);color:#10b981">LM</div>
+          <div class="doc-av" style="background:#f0fdf4;color:#15803d">LM</div>
           <div class="doc-name">Dr. Lena Müller</div>
           <div class="doc-spec">Pediatrics</div>
           <div class="doc-bio">MBBS, DCH · 9 years. Child health from newborns to adolescents, vaccinations included.</div>
           <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
         </div>
         <div class="doc-card">
-          <div class="doc-av" style="background:rgba(99,102,241,.1);color:#6366f1">RP</div>
+          <div class="doc-av" style="background:#f5f3ff;color:#7c3aed">RP</div>
           <div class="doc-name">Dr. Ravi Patel</div>
           <div class="doc-spec">Orthopedics</div>
           <div class="doc-bio">MBBS, MS Ortho · 11 years. Bone, joint and sports injuries. Pre/post-surgical care.</div>
@@ -172,25 +176,25 @@
     <div class="section-inner">
       <div class="section-eyebrow">Process</div>
       <h2 class="section-title">Three steps to <em>your appointment</em></h2>
-      <p class="section-sub" style="margin-bottom:52px">From browsing to booked in under a minute. No paperwork, no phone trees.</p>
+      <p class="section-sub" style="margin-bottom:48px">From browsing to booked in under a minute. No paperwork, no phone trees.</p>
       <div class="steps-grid">
         <div class="step-card">
-          <span class="step-num">01</span>
+          <span class="step-num">1</span>
           <span class="step-icon">🔍</span>
           <div class="step-title">Choose your doctor</div>
-          <p class="step-text">Browse verified specialists by specialty. View real credentials, experience, and live availability — no fake slots.</p>
+          <p class="step-text">Browse verified specialists by specialty. View real credentials, experience, and live availability.</p>
         </div>
         <div class="step-card">
-          <span class="step-num">02</span>
+          <span class="step-num">2</span>
           <span class="step-icon">📅</span>
-          <div class="step-title">Book a slot</div>
-          <p class="step-text">Pick a date and time that works for you. Confirmation lands in your inbox in seconds — zero calling required.</p>
+          <div class="step-title">Pick a slot</div>
+          <p class="step-text">Select a date and time that suits you. Confirmation lands in your inbox in seconds.</p>
         </div>
         <div class="step-card">
-          <span class="step-num">03</span>
+          <span class="step-num">3</span>
           <span class="step-icon">🎥</span>
           <div class="step-title">Join your call</div>
-          <p class="step-text">Connect via HD video from any browser. No app needed. Secure, private, and as comfortable as your couch.</p>
+          <p class="step-text">Connect via HD video from any browser. No app needed. Secure, private, comfortable.</p>
         </div>
       </div>
     </div>
@@ -202,13 +206,14 @@
       <div class="section-header">
         <div class="section-eyebrow">Pricing</div>
         <h2 class="section-title">Simple, <em>transparent</em> pricing</h2>
-        <p class="section-sub">Booking is always free. Pay your doctor directly — we never add hidden fees.</p>
+        <p class="section-sub">Booking is always free. Pay your doctor directly — no hidden fees.</p>
       </div>
-      <div class="pricing-grid" style="max-width:880px">
+      <div class="pricing-grid" style="max-width:860px">
         <div class="pricing-card">
           <div class="pricing-plan">Starter</div>
-          <div class="pricing-price">₹0 <span>/booking</span></div>
-          <div class="pricing-desc">For patients who want occasional care without any commitment.</div>
+          <div class="pricing-price">₹0 <span>/ booking</span></div>
+          <div class="pricing-desc">For patients who want occasional care without commitment.</div>
+          <div class="pricing-divider"></div>
           <ul class="pricing-features">
             <li>Browse all verified doctors</li>
             <li>Book same-day appointments</li>
@@ -218,10 +223,11 @@
           <button class="btn-outline full-w" onclick="showApp('patient','signup')">Get started free</button>
         </div>
         <div class="pricing-card featured">
-          <div class="pricing-badge">Most Popular</div>
+          <div class="pricing-badge">Most popular</div>
           <div class="pricing-plan">Pro</div>
-          <div class="pricing-price">₹299 <span>/month</span></div>
-          <div class="pricing-desc">For patients who want priority access and regular care.</div>
+          <div class="pricing-price">₹299 <span>/ month</span></div>
+          <div class="pricing-desc">For patients who want priority access and ongoing care.</div>
+          <div class="pricing-divider"></div>
           <ul class="pricing-features">
             <li>Everything in Starter</li>
             <li>Priority booking</li>
@@ -233,13 +239,14 @@
         </div>
         <div class="pricing-card">
           <div class="pricing-plan">Doctor</div>
-          <div class="pricing-price">₹0 <span>/month</span></div>
+          <div class="pricing-price">₹0 <span>/ month</span></div>
           <div class="pricing-desc">For doctors to manage appointments and reach more patients.</div>
+          <div class="pricing-divider"></div>
           <ul class="pricing-features">
             <li>Full appointment dashboard</li>
             <li>Patient management</li>
             <li>Video call platform</li>
-            <li>Analytics &amp; stats</li>
+            <li>Analytics &amp; reporting</li>
           </ul>
           <button class="btn-outline full-w" onclick="showApp('doctor','login')">Join as doctor</button>
         </div>
@@ -252,9 +259,9 @@
     <div class="section-inner">
       <div class="about-grid">
         <div class="about-text">
-          <div class="section-eyebrow">About DocDrop</div>
+          <div class="section-eyebrow">About</div>
           <h2 class="section-title">Built for <em>real care,</em><br>not red tape.</h2>
-          <p>We started DocDrop because getting a doctor's appointment in India shouldn't require three phone calls, a week of waiting, and half a day off work. You deserve better.</p>
+          <p>We started DocDrop because getting a doctor's appointment in India shouldn't require three phone calls, a week of waiting, and half a day off work.</p>
           <p>Every doctor on our platform is personally verified — credentials checked, background screened, availability confirmed. We connect you directly, with no middlemen and no markups.</p>
           <button class="btn-cta" onclick="showApp('patient','signup')" style="margin-top:8px">Try DocDrop free →</button>
         </div>
@@ -271,7 +278,7 @@
   <footer>
     <div class="footer-inner">
       <div class="footer-logo">Doc<em>Drop</em></div>
-      <div class="footer-copy">© 2025 DocDrop · All rights reserved.</div>
+      <div class="footer-copy">© 2025 DocDrop. All rights reserved.</div>
       <div class="footer-links">
         <a href="#">Privacy</a>
         <a href="#">Terms</a>
@@ -280,11 +287,10 @@
     </div>
   </footer>
 
-</div><!-- /landingPage -->
+</div>
 
-<!-- ══════════════════════════ APP SHELL ══════════════════════════ -->
+<!-- APP SHELL -->
 <div id="appShell" class="hidden">
-
   <header id="appHeader">
     <a class="nav-logo" onclick="backToLanding()" style="cursor:pointer">Doc<em>Drop</em></a>
     <div id="navUser"></div>
@@ -300,22 +306,22 @@
 
           <div id="authStep1">
             <h2 id="authTitle">Welcome back</h2>
-            <p class="auth-sub" id="authSubtitle">Sign in to your account to continue.</p>
+            <p class="auth-sub" id="authSubtitle">Sign in to continue to DocDrop.</p>
 
             <div class="form-group" id="nameField" style="display:none">
               <label>Full name</label>
-              <input id="aName" type="text" placeholder="Your full name"/>
+              <input id="aName" type="text" placeholder="Your full name" autocomplete="name"/>
             </div>
             <div class="form-group">
-              <label>Email address</label>
-              <input id="aEmail" type="email" placeholder="you@example.com"/>
+              <label>Email</label>
+              <input id="aEmail" type="email" placeholder="you@example.com" autocomplete="email"/>
             </div>
             <div class="form-group">
               <label>Password</label>
               <div class="input-icon-wrap">
-                <input id="aPass" type="password" placeholder="••••••••"
-                       onkeydown="if(event.key==='Enter') document.querySelector('#authBtns .btn-cta').click()"/>
-                <button class="toggle-pw" onclick="togglePw()" type="button">👁</button>
+                <input id="aPass" type="password" placeholder="••••••••" autocomplete="current-password"
+                  onkeydown="if(event.key==='Enter') document.querySelector('#authBtns .btn-cta')?.click()"/>
+                <button class="toggle-pw" onclick="togglePw()" type="button" tabindex="-1">👁</button>
               </div>
             </div>
 
@@ -326,10 +332,10 @@
 
           <div id="authStep2" class="hidden">
             <span class="otp-icon">📬</span>
-            <h2>Verify your email</h2>
-            <p class="auth-sub" id="otpSubtext">We sent a 6-digit code to your email.</p>
+            <h2>Check your email</h2>
+            <p class="auth-sub" id="otpSubtext">We sent a 6-digit code to your email address.</p>
             <div class="otp-inputs">
-              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" oninput="otpNext(this,0)" onkeydown="otpBack(this,event,0)"/>
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" oninput="otpNext(this,0)" onkeydown="otpBack(this,event,0)" autocomplete="one-time-code"/>
               <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" oninput="otpNext(this,1)" onkeydown="otpBack(this,event,1)"/>
               <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" oninput="otpNext(this,2)" onkeydown="otpBack(this,event,2)"/>
               <span class="otp-sep">—</span>
@@ -341,7 +347,7 @@
               <span class="otp-timer" id="otpTimer"></span>
               <button class="link-btn hidden" id="resendBtn" onclick="resendOtp()">Resend code</button>
             </div>
-            <button id="verifyOtpBtn" class="btn-cta" style="width:100%;padding:13px;font-size:14px" onclick="verifyOtpAndSignup()" disabled>
+            <button id="verifyOtpBtn" class="btn-cta" style="width:100%;padding:10px;font-size:14px" onclick="verifyOtpAndSignup()" disabled>
               Verify &amp; Create Account
             </button>
             <a href="#" class="back-link" onclick="backToStep1(); return false;">← Use a different email</a>
@@ -351,7 +357,7 @@
         <div class="auth-side">
           <p class="side-tagline">Join <strong>500+ patients</strong> who get care on their terms with DocDrop.</p>
           <div class="side-card">
-            <div class="side-av" style="background:rgba(16,185,129,.1);color:#10b981">SC</div>
+            <div class="side-av" style="background:#f0fdf4;color:#16a34a">SC</div>
             <div class="side-name">Dr. Sarah Chen</div>
             <div class="side-spec">General Physician</div>
             <div class="side-stats">
@@ -360,7 +366,7 @@
             </div>
           </div>
           <div class="side-card">
-            <div class="side-av" style="background:rgba(56,189,248,.1);color:#38bdf8">MW</div>
+            <div class="side-av" style="background:#eff6ff;color:#1d4ed8">MW</div>
             <div class="side-name">Dr. Marcus Webb</div>
             <div class="side-spec">Cardiology</div>
             <div class="side-stats">
@@ -375,8 +381,8 @@
     <div id="patientDash" class="hidden">
       <div class="page-head">
         <div>
-          <h2>My Dashboard</h2>
-          <p class="subtext">Book appointments and manage your health.</p>
+          <h2>Dashboard</h2>
+          <p class="subtext">Manage your appointments</p>
         </div>
       </div>
       <div class="grid-two">
@@ -385,16 +391,16 @@
           <div class="box-body">
             <div class="form-group">
               <label>Doctor</label>
-              <select id="doctorSelect"><option value="">— choose a doctor —</option></select>
+              <select id="doctorSelect"><option value="">Select a doctor</option></select>
             </div>
             <div class="form-group">
               <label>Date</label>
               <input id="pDate" type="date"/>
             </div>
             <div class="form-group">
-              <label>Time Slot</label>
+              <label>Time</label>
               <select id="slotSelect">
-                <option value="">— choose a time —</option>
+                <option value="">Select a time slot</option>
                 <option>9:00</option><option>9:30</option><option>10:00</option><option>10:30</option>
                 <option>11:00</option><option>11:30</option><option>2:00</option><option>2:30</option>
                 <option>3:00</option><option>3:30</option><option>4:00</option><option>4:30</option>
@@ -404,7 +410,7 @@
               <label>Notes <span class="optional-tag">optional</span></label>
               <textarea id="pNotes" rows="3" placeholder="Reason for visit…"></textarea>
             </div>
-            <button id="bookBtn" onclick="bookAppointment()" class="btn-cta book-btn">📅 Book Appointment</button>
+            <button id="bookBtn" onclick="bookAppointment()" class="book-btn">Book Appointment</button>
           </div>
         </div>
         <div class="box">
@@ -423,8 +429,8 @@
     <div id="doctorAdmin" class="hidden">
       <div class="page-head">
         <div>
-          <h2>Doctor Dashboard</h2>
-          <p class="subtext">Manage your appointments and patient bookings.</p>
+          <h2>Dashboard</h2>
+          <p class="subtext">Manage your appointments and patients</p>
         </div>
       </div>
       <div class="stats-row">
@@ -435,7 +441,7 @@
       </div>
       <div class="box">
         <div class="filter-strip">
-          <label>Filter by doctor</label>
+          <label>Filter</label>
           <select id="adminDoctorFilter" onchange="loadAdminAppts()"><option value="">All Doctors</option></select>
         </div>
         <div class="table-wrap">
@@ -452,17 +458,14 @@
       <div class="call-wrap">
         <div class="call-bar">
           <div class="call-bar-left">
-            <div class="call-status" id="callStatus">
-              <span class="call-dot"></span>
-              <span id="callStatusText">Connecting…</span>
-            </div>
+            <div class="call-status" id="callStatus"><span class="call-dot"></span><span id="callStatusText">Connecting…</span></div>
             <div class="call-meta" id="callApptInfo"></div>
           </div>
           <div class="call-btns">
             <button class="cbtn" id="btnMic" onclick="toggleMic()">🎙 Mute</button>
             <button class="cbtn" id="btnCam" onclick="toggleCam()">📷 Camera</button>
             <button class="cbtn" id="btnChat" onclick="toggleCallChat()">💬 Chat</button>
-            <button class="cbtn cbtn-end" onclick="endCall()">📵 End Call</button>
+            <button class="cbtn cbtn-end" onclick="endCall()">End Call</button>
           </div>
         </div>
         <div class="call-body">
@@ -482,14 +485,14 @@
           </div>
           <div id="callChatSidebar" class="call-chat-sidebar hidden">
             <div class="call-chat-header">
-              <span>💬 In-Call Chat</span>
+              <span>Chat</span>
               <button class="call-chat-close" onclick="toggleCallChat()">✕</button>
             </div>
             <div class="call-chat-messages" id="callChatMessages">
               <div class="call-chat-info">Messages are only visible during this call.</div>
             </div>
             <div class="call-chat-input-row">
-              <input id="callChatInput" class="call-chat-input" type="text" placeholder="Type a message…"
+              <input id="callChatInput" class="call-chat-input" type="text" placeholder="Message…"
                      onkeydown="if(event.key==='Enter') sendCallChatMessage()" maxlength="500"/>
               <button class="call-chat-send" onclick="sendCallChatMessage()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -503,37 +506,37 @@
     </div>
 
   </main>
-</div><!-- /appShell -->
+</div>
 
 <!-- TOAST -->
 <div id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
 
-<!-- AI CHAT FAB -->
+<!-- CHAT FAB -->
 <div id="chatFab" class="chat-fab hidden" onclick="toggleChat()">
   <span class="chat-fab-icon">✦</span>
   <span>Ask AI</span>
   <span id="chatUnread" class="chat-unread hidden">1</span>
 </div>
 
-<!-- AI CHAT PANEL -->
+<!-- CHAT PANEL -->
 <div id="chatPanel" class="chat-panel hidden">
   <div class="chat-panel-header">
     <div class="chat-header-info">
       <div class="chat-avatar">✦</div>
       <div>
         <div class="chat-title">DocDrop AI</div>
-        <div class="chat-subtitle" id="chatSubtitle">Your medical assistant</div>
+        <div class="chat-subtitle" id="chatSubtitle">Medical assistant</div>
       </div>
     </div>
     <div class="chat-header-actions">
-      <button class="chat-clear-btn" onclick="clearChat()" title="Clear chat">↺</button>
+      <button class="chat-clear-btn" onclick="clearChat()" title="Clear">↺</button>
       <button class="chat-close-btn" onclick="toggleChat()">✕</button>
     </div>
   </div>
   <div class="chat-messages" id="chatMessages">
     <div class="chat-welcome">
-      <div class="chat-welcome-icon">✦</div>
-      <p id="chatWelcomeText">Hi! I'm your DocDrop AI assistant. I have access to your appointments and can help you prepare, reschedule, or answer health questions.</p>
+      <span class="chat-welcome-icon">✦</span>
+      <p id="chatWelcomeText">Hi! I'm your DocDrop AI assistant. I can help with your appointments, prep for visits, or answer health questions.</p>
       <div class="chat-suggestions" id="chatSuggestions">
         <button onclick="sendSuggestion(this)">Show my upcoming appointments</button>
         <button onclick="sendSuggestion(this)">How do I prepare for my visit?</button>
@@ -542,7 +545,7 @@
     </div>
   </div>
   <div class="chat-input-area">
-    <textarea id="chatInput" class="chat-input" placeholder="Ask anything about your health…" rows="1"
+    <textarea id="chatInput" class="chat-input" placeholder="Ask anything…" rows="1"
       onkeydown="chatKeydown(event)" oninput="autoResizeChatInput(this)"></textarea>
     <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
