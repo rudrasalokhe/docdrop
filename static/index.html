@@ -11,9 +11,9 @@
 </head>
 <body>
 
+<!-- ═══════════════════ LANDING ═══════════════════ -->
 <div id="landingPage">
 
-  <!-- NAV -->
   <nav id="mainNav">
     <div class="nav-inner">
       <a href="#" class="nav-logo" onclick="scrollToTop()">Doc<em>Drop</em></a>
@@ -42,14 +42,10 @@
   <section class="hero">
     <div class="hero-content">
       <div class="hero-eyebrow">
-        <span class="eyebrow-dot"></span>
-        Now serving Mumbai &amp; Pune
+        <span class="eyebrow-dot"></span> Live in Mumbai &amp; Pune
       </div>
       <h1>See a doctor<br><em>today,</em><br>not next week.</h1>
-      <p class="hero-sub">
-        DocDrop connects you with verified specialists in under 60 seconds.
-        No hold music. No callbacks. Just care.
-      </p>
+      <p class="hero-sub">DocDrop connects you with verified specialists in under 60 seconds. No hold music. No callbacks. Just care.</p>
       <div class="hero-actions">
         <button class="btn-cta btn-lg" onclick="showApp('patient','signup')">Book an appointment →</button>
         <button class="btn-outline btn-lg" onclick="showApp('doctor','login')">I'm a doctor</button>
@@ -68,10 +64,7 @@
     <div class="hero-visual">
       <div class="hcard-mini hcard-mini-2">
         <div class="hm-icon">✓</div>
-        <div>
-          <div class="hm-title">Free to book</div>
-          <div class="hm-sub">No payment required</div>
-        </div>
+        <div><div class="hm-title">Free to book</div><div class="hm-sub">No payment needed</div></div>
       </div>
       <div class="hcard">
         <div class="hcard-top">
@@ -84,21 +77,14 @@
         </div>
         <div class="hcard-sublabel">Thursday — open slots</div>
         <div class="hcard-slots">
-          <div class="hslot">9:00</div>
-          <div class="hslot on">9:30</div>
-          <div class="hslot">10:00</div>
-          <div class="hslot on">10:30</div>
-          <div class="hslot">11:00</div>
-          <div class="hslot off">11:30</div>
+          <div class="hslot">9:00</div><div class="hslot on">9:30</div><div class="hslot">10:00</div>
+          <div class="hslot on">10:30</div><div class="hslot">11:00</div><div class="hslot off">11:30</div>
         </div>
         <button class="hcard-btn" onclick="showApp('patient','signup')">Book appointment →</button>
       </div>
       <div class="hcard-mini hcard-mini-1">
         <div class="hm-icon">📅</div>
-        <div>
-          <div class="hm-title">Confirmed!</div>
-          <div class="hm-sub">Dr. Webb · Thu 2:30 PM</div>
-        </div>
+        <div><div class="hm-title">Confirmed!</div><div class="hm-sub">Dr. Webb · Thu 2:30 PM</div></div>
       </div>
     </div>
   </section>
@@ -106,13 +92,13 @@
   <!-- TRUST BAR -->
   <div class="trust-bar">
     <div class="trust-inner">
-      <div class="trust-item"><span class="trust-num">6</span><span>Verified Specialists</span></div>
+      <div class="trust-item"><span class="trust-num">6</span><span>Specialists</span></div>
       <div class="trust-div"></div>
-      <div class="trust-item"><span class="trust-num">500+</span><span>Appointments Booked</span></div>
+      <div class="trust-item"><span class="trust-num">500+</span><span>Booked</span></div>
       <div class="trust-div"></div>
-      <div class="trust-item"><span class="trust-num">Free</span><span>To Book</span></div>
+      <div class="trust-item"><span class="trust-num">Free</span><span>To book</span></div>
       <div class="trust-div"></div>
-      <div class="trust-item"><span class="trust-num">&lt;60s</span><span>To Confirm</span></div>
+      <div class="trust-item"><span class="trust-num">&lt;60s</span><span>To confirm</span></div>
     </div>
   </div>
 
@@ -120,7 +106,7 @@
   <section class="section section-alt" id="doctors">
     <div class="section-inner">
       <div class="section-header">
-        <div class="section-eyebrow">Our Doctors</div>
+        <div class="section-eyebrow">Our doctors</div>
         <h2 class="section-title">Meet our verified <em>specialists</em></h2>
         <p class="section-sub">Every doctor is credentialed, background-checked, and available for same-day bookings.</p>
       </div>
@@ -129,43 +115,43 @@
           <div class="doc-av" style="background:#f0fdf4;color:#16a34a">SC</div>
           <div class="doc-name">Dr. Sarah Chen</div>
           <div class="doc-spec">General Physician</div>
-          <div class="doc-bio">MBBS, MD · 8 years. Specialises in preventive care and chronic disease management.</div>
-          <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
+          <div class="doc-bio">MBBS, MD · 8 years. Preventive care and chronic disease management.</div>
+          <button class="doc-book" onclick="showApp('patient','signup')">Book →</button>
         </div>
         <div class="doc-card">
           <div class="doc-av" style="background:#eff6ff;color:#1d4ed8">MW</div>
           <div class="doc-name">Dr. Marcus Webb</div>
           <div class="doc-spec">Cardiology</div>
-          <div class="doc-bio">MBBS, DM Cardiology · 12 years. Heart health, ECGs, and cardiac risk assessment.</div>
-          <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
+          <div class="doc-bio">MBBS, DM Cardiology · 12 years. Heart health, ECGs, cardiac risk.</div>
+          <button class="doc-book" onclick="showApp('patient','signup')">Book →</button>
         </div>
         <div class="doc-card">
           <div class="doc-av" style="background:#fef2f2;color:#dc2626">PN</div>
           <div class="doc-name">Dr. Priya Nair</div>
           <div class="doc-spec">Dermatology</div>
-          <div class="doc-bio">MBBS, DVD · 6 years. Skin, hair and nail conditions — cosmetic and medical.</div>
-          <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
+          <div class="doc-bio">MBBS, DVD · 6 years. Skin, hair and nail — cosmetic and medical.</div>
+          <button class="doc-book" onclick="showApp('patient','signup')">Book →</button>
         </div>
         <div class="doc-card">
           <div class="doc-av" style="background:#fffbeb;color:#d97706">JO</div>
           <div class="doc-name">Dr. James Okon</div>
           <div class="doc-spec">Neurology</div>
-          <div class="doc-bio">MBBS, DM Neurology · 10 years. Headaches, seizures, neuropathy, and brain health.</div>
-          <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
+          <div class="doc-bio">MBBS, DM Neurology · 10 years. Headaches, seizures, brain health.</div>
+          <button class="doc-book" onclick="showApp('patient','signup')">Book →</button>
         </div>
         <div class="doc-card">
           <div class="doc-av" style="background:#f0fdf4;color:#15803d">LM</div>
           <div class="doc-name">Dr. Lena Müller</div>
           <div class="doc-spec">Pediatrics</div>
-          <div class="doc-bio">MBBS, DCH · 9 years. Child health from newborns to adolescents, vaccinations included.</div>
-          <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
+          <div class="doc-bio">MBBS, DCH · 9 years. Child health, newborns to adolescents.</div>
+          <button class="doc-book" onclick="showApp('patient','signup')">Book →</button>
         </div>
         <div class="doc-card">
           <div class="doc-av" style="background:#f5f3ff;color:#7c3aed">RP</div>
           <div class="doc-name">Dr. Ravi Patel</div>
           <div class="doc-spec">Orthopedics</div>
-          <div class="doc-bio">MBBS, MS Ortho · 11 years. Bone, joint and sports injuries. Pre/post-surgical care.</div>
-          <button class="doc-book" onclick="showApp('patient','signup')">Book appointment →</button>
+          <div class="doc-bio">MBBS, MS Ortho · 11 years. Bone, joint and sports injuries.</div>
+          <button class="doc-book" onclick="showApp('patient','signup')">Book →</button>
         </div>
       </div>
     </div>
@@ -174,27 +160,27 @@
   <!-- HOW IT WORKS -->
   <section class="section" id="how">
     <div class="section-inner">
-      <div class="section-eyebrow">Process</div>
+      <div class="section-eyebrow">How it works</div>
       <h2 class="section-title">Three steps to <em>your appointment</em></h2>
-      <p class="section-sub" style="margin-bottom:48px">From browsing to booked in under a minute. No paperwork, no phone trees.</p>
+      <p class="section-sub" style="margin-bottom:36px">From browsing to booked in under a minute. No paperwork, no phone trees.</p>
       <div class="steps-grid">
         <div class="step-card">
           <span class="step-num">1</span>
           <span class="step-icon">🔍</span>
           <div class="step-title">Choose your doctor</div>
-          <p class="step-text">Browse verified specialists by specialty. View real credentials, experience, and live availability.</p>
+          <p class="step-text">Browse verified specialists. View real credentials, experience, and live availability.</p>
         </div>
         <div class="step-card">
           <span class="step-num">2</span>
           <span class="step-icon">📅</span>
           <div class="step-title">Pick a slot</div>
-          <p class="step-text">Select a date and time that suits you. Confirmation lands in your inbox in seconds.</p>
+          <p class="step-text">Select a date and time that works for you. Confirmation in seconds.</p>
         </div>
         <div class="step-card">
           <span class="step-num">3</span>
           <span class="step-icon">🎥</span>
           <div class="step-title">Join your call</div>
-          <p class="step-text">Connect via HD video from any browser. No app needed. Secure, private, comfortable.</p>
+          <p class="step-text">Connect via HD video from any browser. No app needed. Secure and private.</p>
         </div>
       </div>
     </div>
@@ -208,16 +194,16 @@
         <h2 class="section-title">Simple, <em>transparent</em> pricing</h2>
         <p class="section-sub">Booking is always free. Pay your doctor directly — no hidden fees.</p>
       </div>
-      <div class="pricing-grid" style="max-width:860px">
+      <div class="pricing-grid" style="max-width:820px">
         <div class="pricing-card">
           <div class="pricing-plan">Starter</div>
           <div class="pricing-price">₹0 <span>/ booking</span></div>
-          <div class="pricing-desc">For patients who want occasional care without commitment.</div>
+          <div class="pricing-desc">For occasional care without commitment.</div>
           <div class="pricing-divider"></div>
           <ul class="pricing-features">
-            <li>Browse all verified doctors</li>
-            <li>Book same-day appointments</li>
-            <li>HD video consultations</li>
+            <li>All verified doctors</li>
+            <li>Same-day appointments</li>
+            <li>HD video calls</li>
             <li>Appointment history</li>
           </ul>
           <button class="btn-outline full-w" onclick="showApp('patient','signup')">Get started free</button>
@@ -226,7 +212,7 @@
           <div class="pricing-badge">Most popular</div>
           <div class="pricing-plan">Pro</div>
           <div class="pricing-price">₹299 <span>/ month</span></div>
-          <div class="pricing-desc">For patients who want priority access and ongoing care.</div>
+          <div class="pricing-desc">Priority access and ongoing care.</div>
           <div class="pricing-divider"></div>
           <ul class="pricing-features">
             <li>Everything in Starter</li>
@@ -240,13 +226,13 @@
         <div class="pricing-card">
           <div class="pricing-plan">Doctor</div>
           <div class="pricing-price">₹0 <span>/ month</span></div>
-          <div class="pricing-desc">For doctors to manage appointments and reach more patients.</div>
+          <div class="pricing-desc">Manage appointments, reach more patients.</div>
           <div class="pricing-divider"></div>
           <ul class="pricing-features">
-            <li>Full appointment dashboard</li>
+            <li>Full dashboard</li>
             <li>Patient management</li>
             <li>Video call platform</li>
-            <li>Analytics &amp; reporting</li>
+            <li>Analytics</li>
           </ul>
           <button class="btn-outline full-w" onclick="showApp('doctor','login')">Join as doctor</button>
         </div>
@@ -262,7 +248,7 @@
           <div class="section-eyebrow">About</div>
           <h2 class="section-title">Built for <em>real care,</em><br>not red tape.</h2>
           <p>We started DocDrop because getting a doctor's appointment in India shouldn't require three phone calls, a week of waiting, and half a day off work.</p>
-          <p>Every doctor on our platform is personally verified — credentials checked, background screened, availability confirmed. We connect you directly, with no middlemen and no markups.</p>
+          <p>Every doctor on our platform is personally verified — credentials checked, background screened, availability confirmed.</p>
           <button class="btn-cta" onclick="showApp('patient','signup')" style="margin-top:8px">Try DocDrop free →</button>
         </div>
         <div class="about-mosaic">
@@ -287,12 +273,14 @@
     </div>
   </footer>
 
-</div>
+</div><!-- /landingPage -->
 
-<!-- APP SHELL -->
+
+<!-- ═══════════════════ APP SHELL ═══════════════════ -->
 <div id="appShell" class="hidden">
+
   <header id="appHeader">
-    <a class="nav-logo" onclick="backToLanding()" style="cursor:pointer">Doc<em>Drop</em></a>
+    <a class="nav-logo" onclick="backToLanding()">Doc<em>Drop</em></a>
     <div id="navUser"></div>
   </header>
 
@@ -327,15 +315,15 @@
 
             <div id="authHint" class="auth-hint" style="display:none"></div>
             <div class="btn-group" id="authBtns"></div>
-            <a href="#" class="back-link" onclick="backToLanding(); return false;">← Back to home</a>
+            <a class="back-link" onclick="backToLanding()">← Back to home</a>
           </div>
 
           <div id="authStep2" class="hidden">
             <span class="otp-icon">📬</span>
             <h2>Check your email</h2>
-            <p class="auth-sub" id="otpSubtext">We sent a 6-digit code to your email address.</p>
+            <p class="auth-sub" id="otpSubtext">We sent a 6-digit code to your email.</p>
             <div class="otp-inputs">
-              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" oninput="otpNext(this,0)" onkeydown="otpBack(this,event,0)" autocomplete="one-time-code"/>
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" oninput="otpNext(this,0)" onkeydown="otpBack(this,event,0)"/>
               <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" oninput="otpNext(this,1)" onkeydown="otpBack(this,event,1)"/>
               <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" oninput="otpNext(this,2)" onkeydown="otpBack(this,event,2)"/>
               <span class="otp-sep">—</span>
@@ -350,12 +338,12 @@
             <button id="verifyOtpBtn" class="btn-cta" style="width:100%;padding:10px;font-size:14px" onclick="verifyOtpAndSignup()" disabled>
               Verify &amp; Create Account
             </button>
-            <a href="#" class="back-link" onclick="backToStep1(); return false;">← Use a different email</a>
+            <a class="back-link" onclick="backToStep1()">← Use a different email</a>
           </div>
         </div>
 
         <div class="auth-side">
-          <p class="side-tagline">Join <strong>500+ patients</strong> who get care on their terms with DocDrop.</p>
+          <p class="side-tagline">Join <strong>500+ patients</strong> who get care on their terms.</p>
           <div class="side-card">
             <div class="side-av" style="background:#f0fdf4;color:#16a34a">SC</div>
             <div class="side-name">Dr. Sarah Chen</div>
@@ -398,9 +386,9 @@
               <input id="pDate" type="date"/>
             </div>
             <div class="form-group">
-              <label>Time</label>
+              <label>Time slot</label>
               <select id="slotSelect">
-                <option value="">Select a time slot</option>
+                <option value="">Select a time</option>
                 <option>9:00</option><option>9:30</option><option>10:00</option><option>10:30</option>
                 <option>11:00</option><option>11:30</option><option>2:00</option><option>2:30</option>
                 <option>3:00</option><option>3:30</option><option>4:00</option><option>4:30</option>
@@ -430,7 +418,7 @@
       <div class="page-head">
         <div>
           <h2>Dashboard</h2>
-          <p class="subtext">Manage your appointments and patients</p>
+          <p class="subtext">Manage appointments and patients</p>
         </div>
       </div>
       <div class="stats-row">
@@ -465,7 +453,7 @@
             <button class="cbtn" id="btnMic" onclick="toggleMic()">🎙 Mute</button>
             <button class="cbtn" id="btnCam" onclick="toggleCam()">📷 Camera</button>
             <button class="cbtn" id="btnChat" onclick="toggleCallChat()">💬 Chat</button>
-            <button class="cbtn cbtn-end" onclick="endCall()">End Call</button>
+            <button class="cbtn cbtn-end" onclick="endCall()">End call</button>
           </div>
         </div>
         <div class="call-body">
@@ -506,7 +494,7 @@
     </div>
 
   </main>
-</div>
+</div><!-- /appShell -->
 
 <!-- TOAST -->
 <div id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
